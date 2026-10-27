@@ -1,75 +1,49 @@
-# React + TypeScript + Vite
+# RequestLab
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight Postman alternative that runs locally. Build HTTP requests, organize them into collections, switch between environments and inspect responses.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Send `GET`, `POST`, `PUT` and `DELETE` requests with query params, headers and a JSON or text body
+- Save requests into collections, which persist in your browser's localStorage
+- Environments with `{{variable}}` substitution in the URL, params, headers and body. Missing variables are flagged
+- Response viewer with status, time, size, pretty or raw body, headers and timing history
+- Light and dark themes, and `Ctrl/Cmd + Enter` to send
 
-## React Compiler
+## How it works
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Browsers block most cross-origin requests (CORS), so the app talks to a small local [Hono](https://hono.dev) proxy (`server/`, port 3001, localhost only). The proxy makes the real HTTP call. In development, Vite forwards `/api` to the proxy.
 
-## Expanding the ESLint configuration
+## Tech stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+React 19, TypeScript, Vite, Tailwind CSS v4, shadcn/ui, Zustand, CodeMirror, Hono, Vitest
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Requires Node.js 20 or later.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Then open http://localhost:5173.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Command         | Description                               |
+| --------------- | ----------------------------------------- |
+| `npm run dev`   | Start the proxy (:3001) and the web app (:5173) |
+| `npm test`      | Run unit tests (Vitest)                   |
+| `npm run build` | Type-check and build for production       |
+| `npm run lint`  | Run ESLint                                |
 
+## Project structure
+
+```
+server/           Hono proxy (POST /api/send)
+src/shared/       Types shared by server and web
+src/core/         Framework-agnostic logic (unit-tested)
+src/store/        Zustand store connecting core to the UI
+src/components/   React UI (shadcn components in components/ui)
 ```
